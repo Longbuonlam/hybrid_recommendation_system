@@ -11,8 +11,11 @@ def tfidf_matrix(books):
         + min_df=0: tỉ lệ word không đọc được là 0
         Lúc này ma trận trả về với số dòng tương ứng với số lượng film và số cột tương ứng với số từ được tách ra từ "Genre"
     """
+    # Combine multiple fields into one text string per book
+    books['combined'] = books['Genre'] + ' ' + books['Title'] + ' ' + books['Author'] + ' ' + books['Description']
+
     tf = TfidfVectorizer(analyzer='word', ngram_range=(1, 1), min_df=1)
-    new_tfidf_matrix = tf.fit_transform(books['Genre'])
+    new_tfidf_matrix = tf.fit_transform(books['combined'])
     return new_tfidf_matrix
 
 books = pd.read_csv("dataset/book.csv")

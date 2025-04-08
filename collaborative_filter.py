@@ -1,9 +1,24 @@
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 from sklearn.metrics.pairwise import cosine_similarity
+from scipy import sparse
 
 ratings = pd.read_csv("dataset/rating.csv")
-from scipy import sparse
+
+# Tạo ánh xạ từ UUID sang số nguyên cho user_id và book_id
+user_mapping = {uid: idx + 1 for idx, uid in enumerate(ratings['UserID'].unique())}
+book_mapping = {bookid: idx + 1 for idx, bookid in enumerate(ratings['BookID'].unique())}
+
+# Tạo ánh xạ ngược từ số nguyên sang UUID cho book_id
+reverse_book_mapping = {idx: bookid for bookid, idx in book_mapping.items()}
+
+def get_book_uuid_by_index(reverse_book_mapping, index_list):
+    return [reverse_book_mapping[idx] for idx in index_list]
+
+# Áp dụng ánh xạ cho user_id và book_id
+ratings['user_id'] = ratings['UserID'].map(user_mapping)
+ratings['book_id'] = ratings['BookID'].map(book_mapping)
+
 
 class CF(object):
     """
@@ -147,7 +162,7 @@ class CF(object):
         return sorted_items
     
     
-rating_matrix = ratings[['UserID', 'BookID', 'Rating']].values
+rating_matrix = ratings[['user_id', 'book_id', 'Rating']].values
 cf_model = CF(rating_matrix, k=5, uuCF=1)  # Using user-user CF with 5 neighbors
 cf_model.fit()
 

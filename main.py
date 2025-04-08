@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from recommend import recommend_for_user
+from content_base import content_based_recommend
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -8,6 +9,7 @@ app = FastAPI()
 origins = [
     "http://localhost:9000", 
     "http://127.0.0.1:9000", 
+    "http://localhost:8080",
 ]
 
 app.add_middleware(
@@ -23,13 +25,18 @@ def read_root():
     return {"message": "Hello from FastAPI!"}
 
 @app.get("/recommend/{user_id}")
-def get_recommendations(user_id: int):
-    recommendations = recommend_for_user(user_id)
+def get_recommendations(user_id: str):
+    recommendations = recommend_for_user(user_id, 10)
 
     # Convert recommendations (tuples) to a list of dictionaries
     recommendations_dict = [
-        {"book_id": int(rec[0]), "predicted_rating": float(rec[1])}  # Convert numpy.int64 to int and predicted_rating to float
+        {"book_id": str(rec[0]), "predicted_rating": float(rec[1])}
         for rec in recommendations
     ]
     
     return {"user_id": user_id, "recommendations": recommendations_dict}
+
+@app.get("/recommend/book/{book_id}")
+def get_book_recommendations(book_id: str):
+    recommendations = content_based_recommend(book_id, 5)
+    return {"book_id": book_id, "recommendations": recommendations}
