@@ -38,5 +38,5 @@ def get_recommendations(user_id: str):
 
 @app.get("/recommend/book/{book_id}")
 def get_book_recommendations(book_id: str):
-    recommendations = content_based_recommend(book_id, 5)
+    recommendations = content_based_recommend(book_id, 6)
     return {"book_id": book_id, "recommendations": recommendations}
