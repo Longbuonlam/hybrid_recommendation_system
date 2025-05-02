@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from recommend import recommend_for_user
 from content_base import content_based_recommend
 from fastapi.middleware.cors import CORSMiddleware
+from update_data import write_books_csv, write_users_csv, write_ratings_csv, SyncData
 
 app = FastAPI()
 
@@ -40,3 +41,18 @@ def get_recommendations(user_id: str):
 def get_book_recommendations(book_id: str):
     recommendations = content_based_recommend(book_id, 6)
     return {"book_id": book_id, "recommendations": recommendations}
+
+@app.post("/update-daily-data")
+async def update_data(sync_data: SyncData):
+    books = sync_data.books
+    users = sync_data.users
+    ratings = sync_data.ratings
+
+    if books:
+        write_books_csv(books)
+    if users:
+        write_users_csv(users)
+    if ratings:
+        write_ratings_csv(ratings)
+
+    return {"message": "Data updated successfully"}
