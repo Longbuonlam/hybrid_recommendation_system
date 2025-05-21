@@ -6,19 +6,15 @@ from update_data import write_books_csv, write_users_csv, write_ratings_csv, Syn
 
 app = FastAPI()
 
-# Allow requests from specific ports (e.g., frontend on localhost:3000)
-origins = [
-    "http://localhost:9000", 
-    "http://127.0.0.1:9000", 
-    "http://localhost:8080",
-]
+# Allow requests from specific ports
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # origins allowed to make requests
+    allow_origins=origins,  
     allow_credentials=True,
-    allow_methods=["*"],    # allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],    # allow all headers
+    allow_methods=["*"],    
+    allow_headers=["*"],    
 )
 
 @app.get("/")
